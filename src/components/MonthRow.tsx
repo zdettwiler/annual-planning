@@ -21,7 +21,7 @@ export default function MonthRow({ year, month }: MonthRowProps) {
         </div>
       </div>
       {[...Array(31)].map((e, i) => (
-        <DayCell key={i} date={new Date(year, month, i + 1)} />
+        <DayCell key={i} date={new Date(year, month, i + 1)} month={month} />
       ))}
     </div>
   );
