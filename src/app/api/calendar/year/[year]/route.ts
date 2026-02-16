@@ -34,12 +34,13 @@ export async function GET(
 
   const data = await res.json();
 
+  // return Response.json(data);
   return Response.json(
     data.items.map((d) => ({
       id: d.id,
       label: d.summary,
-      start: d.start,
-      end: d.end,
+      start: d.start.date || d.start.dateTime,
+      end: d.end.date || d.end.dateTime,
     })),
   );
 }
