@@ -1,21 +1,30 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(
+  req: Request,
+  { params }: { params: { year: string } },
+) {
+  const { year } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session?.accessToken) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  const planningCalendarId = user?.annualPlanningCalendarId ?? "primary"; // TODO: deal with fallback
+
   // Calculate date range
-  const now = new Date();
-  const startYear = new Date(now.getFullYear(), 0, 1).toISOString();
-  const endYear = new Date(now.getFullYear(), 11, 1).toISOString();
+  const startYear = new Date(parseInt(year), 0, 1).toISOString();
+  const endYear = new Date(parseInt(year), 11, 1).toISOString();
 
   // Fetch events from Google Calendar
   const res = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${startYear}&timeMax=${endYear}&singleEvents=true&orderBy=startTime`,
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(planningCalendarId)}/events?timeMin=${startYear}&timeMax=${endYear}&singleEvents=true&orderBy=startTime`,
     {
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
@@ -24,7 +33,15 @@ export async function GET() {
   );
 
   const data = await res.json();
-  return Response.json(data);
+
+  return Response.json(
+    data.items.map((d) => ({
+      id: d.id,
+      label: d.summary,
+      start: d.start,
+      end: d.end,
+    })),
+  );
 }
 
 export async function POST(req: Request) {
