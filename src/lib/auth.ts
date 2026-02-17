@@ -2,8 +2,9 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./prisma";
 import { refreshAccessToken } from "./refreshToken";
+import type { NextAuthOptions } from "next-auth";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
@@ -22,22 +23,20 @@ export const authOptions = {
   ],
   callbacks: {
     async jwt({ token, account }) {
-      // First login
       if (account) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
       }
 
-      // Refresh if expired
-      if (Date.now() > (token.expiresAt || 0) * 1000) {
-        const refreshed = await refreshAccessToken(token.refreshToken);
+      if (token.expiresAt && Date.now() > token.expiresAt * 1000) {
+        const refreshed = await refreshAccessToken(token.refreshToken!);
+
         token.accessToken = refreshed.accessToken;
         token.expiresAt = refreshed.expiresAt;
 
-        // Update DB
         await prisma.account.updateMany({
-          where: { userId: token.sub },
+          where: { userId: token.sub! },
           data: {
             access_token: refreshed.accessToken,
             expires_at: refreshed.expiresAt,

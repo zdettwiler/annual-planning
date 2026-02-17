@@ -1,18 +1,39 @@
 import DayCell from "@/components/DayCell";
-// 'use client'
-// import { useContext } from 'react'
-// import type { BibleWithLLB } from '@/types'
 
 interface MonthRowProps {
   year: number;
   month: number;
-  events: Array<{ id: string; label: string; start: string; end: string }>;
+  events: Array<{
+    id: string;
+    label: string;
+    project: string;
+    start: string;
+    end: string;
+  }>;
 }
+
+const projectColours = [
+  "bg-blue-500",
+  "bg-orange-500",
+  "bg-yellow-500",
+  "bg-green-500",
+  "bg-purple-500",
+];
 
 export default function MonthRow({ year, month, events }: MonthRowProps) {
   const shortMonthName = new Intl.DateTimeFormat("fr-FR", {
     month: "short",
   }).format(new Date(year, month, 1));
+
+  const projects = events.reduce((projects, event) => {
+    if (!projects.includes(event.project)) {
+      projects.push(event.project);
+    }
+    return projects;
+  }, []);
+  console.log(projects);
+
+  console.log(projectColours[projects.indexOf("Vacances")]);
 
   return (
     <div className="relative grid grid-cols-[30px_1fr] h-16">
@@ -37,13 +58,13 @@ export default function MonthRow({ year, month, events }: MonthRowProps) {
           .map((e, i) => (
             <div
               key={i}
-              className="text-xs/3 text-white bg-blue-500 rounded-md h-3 self-center px-2"
+              className={`text-xs/3 text-white ${projectColours[projects.indexOf(e.project)]} rounded-full h-3 self-center px-2`}
               style={{
                 gridColumn: `${new Date(e.start).getDate()} / ${new Date(e.end).getDate()}`,
                 gridRow: 1,
               }}
             >
-              <span className=" ">{e.label}</span>
+              <span className="">{e.label}</span>
             </div>
           ))}
       </div>

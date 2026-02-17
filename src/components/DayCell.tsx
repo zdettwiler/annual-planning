@@ -10,11 +10,14 @@ export default function DayCell({ date, month }: DayCellProps) {
 
   return (
     <div
-      className={`p-1 flex-1 border-l border-gray-200 text-xs ${!isThisMonth && "bg-gray-200"} ${isWeekend && "bg-blue-100"}`}
+      className={`p-1 border-l border-gray-200 text-xs
+        ${!isThisMonth ? "bg-gray-200" : ""}
+        ${isWeekend ? "bg-blue-100" : ""}`}
     >
       {isThisMonth && (
         <div
-          className={`size-4 flex items-center justify-center rounded-full font-semibold ${isToday && "bg-red-500 text-white"}`}
+          className={`self-start size-5 font-semibold rounded-full flex items-center justify-center
+        ${isToday ? "bg-red-500 text-white" : ""}`}
         >
           {date.getDate()}
         </div>

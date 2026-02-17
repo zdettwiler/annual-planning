@@ -1,8 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import type { Session } from "next-auth";
 
-export default async function getYearEvents(session, year) {
+export default async function getYearEvents(
+  session: Session,
+  year: string | number,
+) {
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: session.user?.email },
   });
 
   const planningCalendarId = user?.annualPlanningCalendarId ?? "primary"; // TODO: deal with fallback
@@ -22,12 +26,12 @@ export default async function getYearEvents(session, year) {
   );
 
   const data = await res.json();
-  console.log(data);
 
   // return Response.json(data);
   return data.items.map((d) => ({
     id: d.id,
-    label: d.summary,
+    label: d.summary.includes("/") ? d.summary.split("/")[1] : d.summary,
+    project: d.summary.includes("/") ? d.summary.split("/")[0] : undefined,
     start: d.start.date || d.start.dateTime,
     end: d.end.date || d.end.dateTime,
   }));
