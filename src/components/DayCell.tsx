@@ -14,7 +14,7 @@ export default function DayCell({ date, month }: DayCellProps) {
     >
       {isThisMonth && (
         <div
-          className={`size-4 flex items-center justify-center rounded-full ${isToday && "bg-red-500 text-white"}`}
+          className={`size-4 flex items-center justify-center rounded-full font-semibold ${isToday && "bg-red-500 text-white"}`}
         >
           {date.getDate()}
         </div>
