@@ -1,3 +1,7 @@
+"use client";
+
+import { useDroppable } from "@dnd-kit/react";
+
 interface DayCellProps {
   date: Date;
   month: number;

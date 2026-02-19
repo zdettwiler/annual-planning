@@ -1,4 +1,5 @@
 import DayCell from "@/components/DayCell";
+import Event from "@/components/Event";
 
 interface MonthRowProps {
   year: number;
@@ -56,16 +57,11 @@ export default function MonthRow({ year, month, events }: MonthRowProps) {
         {events
           .filter((e) => new Date(e.start).getMonth() === month)
           .map((e, i) => (
-            <div
+            <Event
               key={i}
-              className={`text-xs/3 text-white ${projectColours[projects.indexOf(e.project)]} rounded-full h-3 self-center px-2`}
-              style={{
-                gridColumn: `${new Date(e.start).getDate()} / ${new Date(e.end).getDate()}`,
-                gridRow: 1,
-              }}
-            >
-              <span className="">{e.label}</span>
-            </div>
+              colour={projectColours[projects.indexOf(e.project)]}
+              event={e}
+            />
           ))}
       </div>
     </div>
