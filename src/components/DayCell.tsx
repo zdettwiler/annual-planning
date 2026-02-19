@@ -12,11 +12,20 @@ export default function DayCell({ date, month }: DayCellProps) {
   const isWeekend = date.getDay() === 6 || date.getDay() === 0;
   const isThisMonth = date.getMonth() === month;
 
+  // Create a unique ID for this date
+  const dateId = date.toLocaleDateString("en-CA"); // trick to get YYYY-MM-DD format
+  const { ref, isOver } = useDroppable({
+    id: dateId,
+  });
+
   return (
     <div
-      className={`p-1 border-l border-gray-200 text-xs
+      ref={ref}
+      data={dateId}
+      className={`p-1 border-l border-gray-200 text-xs transition-colors
         ${!isThisMonth ? "bg-gray-200" : ""}
-        ${isWeekend ? "bg-blue-100" : ""}`}
+        ${isWeekend ? "bg-blue-100" : ""}
+        ${isOver ? "bg-green-200" : ""}`}
     >
       {isThisMonth && (
         <div

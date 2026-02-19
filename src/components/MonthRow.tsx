@@ -32,9 +32,6 @@ export default function MonthRow({ year, month, events }: MonthRowProps) {
     }
     return projects;
   }, []);
-  console.log(projects);
-
-  console.log(projectColours[projects.indexOf("Vacances")]);
 
   return (
     <div className="relative grid grid-cols-[30px_1fr] h-16">
@@ -61,6 +58,7 @@ export default function MonthRow({ year, month, events }: MonthRowProps) {
               key={i}
               colour={projectColours[projects.indexOf(e.project)]}
               event={e}
+              draggedEventId={e.id}
             />
           ))}
       </div>
