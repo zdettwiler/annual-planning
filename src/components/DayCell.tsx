@@ -7,16 +7,17 @@ interface DayCellProps {
   month: number;
 }
 
+// Custom collision detector: checks which droppable (day cell) is hovered by top left corner of event bar
 const topLeftCollision: CollisionDetector = ({ dragOperation, droppable }) => {
   const draggableEl = dragOperation.source.element;
   const droppableEl = droppable.element;
 
   if (!draggableEl || !droppableEl) return null;
 
-  const activeRect = draggableEl.getBoundingClientRect();
+  const draggableRect = draggableEl.getBoundingClientRect();
   const droppableRect = droppableEl.getBoundingClientRect();
 
-  const { left, top } = activeRect;
+  const { left, top } = draggableRect;
 
   const isWithin =
     left >= droppableRect.left &&

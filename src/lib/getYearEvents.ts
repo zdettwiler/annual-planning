@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { Session } from "next-auth";
+import moment from "moment";
 
 export default async function getYearEvents(
   session: Session,
@@ -28,11 +29,18 @@ export default async function getYearEvents(
   const data = await res.json();
 
   // return Response.json(data);
-  return data.items.map((d) => ({
-    id: d.id,
-    label: d.summary.includes("/") ? d.summary.split("/")[1] : d.summary,
-    project: d.summary.includes("/") ? d.summary.split("/")[0] : undefined,
-    start: d.start.date || d.start.dateTime,
-    end: d.end.date || d.end.dateTime,
-  }));
+  return data.items.map((d) => {
+    const start = d.start.date || d.start.dateTime;
+    const end = d.end.date || d.end.dateTime;
+
+    return {
+      id: d.id,
+      label: d.summary.includes("/") ? d.summary.split("/")[1] : d.summary,
+      project: d.summary.includes("/") ? d.summary.split("/")[0] : undefined,
+      start,
+      end,
+      duration: moment.duration(moment(end).diff(moment(start))).toJSON(),
+      isAllDay: d.start.date,
+    };
+  });
 }

@@ -1,0 +1,44 @@
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import type { Session } from "next-auth";
+import moment from "moment";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+
+export default async function patchEvent(event) {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("Unauthorized");
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user?.email },
+  });
+
+  const planningCalendarId = user?.annualPlanningCalendarId ?? "primary"; // TODO: deal with fallback
+  console.log(planningCalendarId);
+
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(planningCalendarId)}/events/${event.id}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        summary: event.project
+          ? `${event.project}/${event.label}`
+          : event.label,
+        start: {
+          date: event.isAllDay ? event.start : undefined,
+          dateTime: event.isAllDay ? undefined : event.start,
+        },
+        end: {
+          date: event.isAllDay ? event.end : undefined,
+          dateTime: event.isAllDay ? undefined : event.end,
+        },
+      }),
+    },
+  );
+  console.log(res);
+}
