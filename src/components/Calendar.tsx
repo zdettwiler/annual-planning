@@ -16,38 +16,10 @@ export default function Calendar({ year, events }: CalendarProps) {
       onDragStart={({ operation }) => {
         console.log("Started dragging", operation.source?.id);
       }}
-      onDragOver={(event) => {
-        console.log(
-          `${event.operation.source?.id} is over ${event.operation.target?.id}`,
-        );
-
-        const eventBar = event.operation.source?.element;
-        const rect = eventBar.getBoundingClientRect();
-
-        const cursorX = event.operation.position.current.x;
-        const offsetPx = cursorX - rect.left;
-
-        // difference in milliseconds
-        const calendarEvent = events.find(
-          (e) => e.id === event.operation.source?.id,
-        );
-        const eventDurationMs =
-          new Date(calendarEvent.end) - new Date(calendarEvent.start);
-
-        // convert to days
-        const eventDurationDays = eventDurationMs / (1000 * 60 * 60 * 24);
-
-        console.log("eventDurationDays", eventDurationDays);
-
-        const dayWidth = rect.width / eventDurationDays;
-
-        const dragOffsetDays = Math.floor(offsetPx / dayWidth);
-
-        const newStartDate = moment(calendarEvent.start).subtract(
-          dragOffsetDays,
-          "days",
-        );
-        console.log("newStartDate", newStartDate.format());
+      onDragEnd={({ operation }) => {
+        const eventId = operation.source?.id;
+        const newDate = operation.target?.id;
+        console.log("event", eventId, "date", newDate);
       }}
     >
       <div className="divide-y divide-gray-200">

@@ -1,11 +1,33 @@
 "use client";
 
-import { useDroppable } from "@dnd-kit/react";
+import { useDroppable, type CollisionDetector } from "@dnd-kit/react";
 
 interface DayCellProps {
   date: Date;
   month: number;
 }
+
+const topLeftCollision: CollisionDetector = ({ dragOperation, droppable }) => {
+  const draggableEl = dragOperation.source.element;
+  const droppableEl = droppable.element;
+
+  if (!draggableEl || !droppableEl) return null;
+
+  const activeRect = draggableEl.getBoundingClientRect();
+  const droppableRect = droppableEl.getBoundingClientRect();
+
+  const { left, top } = activeRect;
+
+  const isWithin =
+    left >= droppableRect.left &&
+    left <= droppableRect.right &&
+    top >= droppableRect.top &&
+    top <= droppableRect.bottom;
+
+  if (!isWithin) return null;
+
+  return { id: droppable.id };
+};
 
 export default function DayCell({ date, month }: DayCellProps) {
   const isToday = date.toDateString() === new Date().toDateString();
@@ -16,12 +38,12 @@ export default function DayCell({ date, month }: DayCellProps) {
   const dateId = date.toLocaleDateString("en-CA"); // trick to get YYYY-MM-DD format
   const { ref, isOver } = useDroppable({
     id: dateId,
+    collisionDetector: topLeftCollision,
   });
 
   return (
     <div
       ref={ref}
-      data={dateId}
       className={`p-1 border-l border-gray-200 text-xs transition-colors
         ${!isThisMonth ? "bg-gray-200" : ""}
         ${isWeekend ? "bg-blue-100" : ""}
