@@ -1,10 +1,9 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { Session } from "next-auth";
-import moment from "moment";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import simplifyGoogleEvent from "@/lib/simplifyGoogleEvent";
 
 export default async function patchEvent(event) {
   const session = await getServerSession(authOptions);
@@ -40,5 +39,7 @@ export default async function patchEvent(event) {
       }),
     },
   );
-  console.log(res);
+  const updatedEvent = await res.json();
+  console.log(updatedEvent);
+  return simplifyGoogleEvent(updatedEvent);
 }

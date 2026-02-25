@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import type { Session } from "next-auth";
-import moment from "moment";
+import simplifyGoogleEvent from "@/lib/simplifyGoogleEvent";
+import type { GoogleEvent, SimpleEvent } from "@/lib/types";
 
 export default async function getYearEvents(
   session: Session,
   year: string | number,
-) {
+): Promise<SimpleEvent[]> {
   const user = await prisma.user.findUnique({
     where: { email: session.user?.email },
   });
@@ -29,18 +30,5 @@ export default async function getYearEvents(
   const data = await res.json();
 
   // return Response.json(data);
-  return data.items.map((d) => {
-    const start = d.start.date || d.start.dateTime;
-    const end = d.end.date || d.end.dateTime;
-
-    return {
-      id: d.id,
-      label: d.summary.includes("/") ? d.summary.split("/")[1] : d.summary,
-      project: d.summary.includes("/") ? d.summary.split("/")[0] : undefined,
-      start,
-      end,
-      duration: moment.duration(moment(end).diff(moment(start))).toJSON(),
-      isAllDay: d.start.date,
-    };
-  });
+  return data.items.map((d: GoogleEvent) => simplifyGoogleEvent(d));
 }

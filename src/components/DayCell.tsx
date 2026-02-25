@@ -34,6 +34,9 @@ export default function DayCell({ date, month }: DayCellProps) {
   const isToday = date.toDateString() === new Date().toDateString();
   const isWeekend = date.getDay() === 6 || date.getDay() === 0;
   const isThisMonth = date.getMonth() === month;
+  const shortDayName = new Intl.DateTimeFormat("fr-FR", {
+    weekday: "short",
+  }).format(date);
 
   // Create a unique ID for this date
   const dateId = date.toLocaleDateString("en-CA"); // trick to get YYYY-MM-DD format
@@ -55,7 +58,7 @@ export default function DayCell({ date, month }: DayCellProps) {
           className={`self-start size-5 font-semibold rounded-full flex items-center justify-center
         ${isToday ? "bg-red-500 text-white" : ""}`}
         >
-          {date.getDate()}
+          <span>{date.getDate()}</span>
         </div>
       )}
     </div>
